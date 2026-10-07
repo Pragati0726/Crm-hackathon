@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 # Environment files
+=======
+>>>>>>> 82e31aaa5d37040b804b88afb9ec565c57ac16cf
 .env
 .env.*
 !.env.example
