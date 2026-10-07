@@ -1,0 +1,73 @@
+services:
+
+  espocrm-db:
+    image: mariadb:latest
+    container_name: espocrm-db
+
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: espocrm
+      MARIADB_USER: espocrm
+      MARIADB_PASSWORD: databasepassword
+
+    volumes:
+      - espocrm-db:/var/lib/mysql
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 20s
+      start_period: 10s
+      timeout: 10s
+      retries: 3
+
+
+  espocrm:
+    image: espocrm/espocrm:10.0.9
+    container_name: espocrm
+
+    environment:
+      ESPOCRM_DATABASE_HOST: espocrm-db
+      ESPOCRM_DATABASE_USER: espocrm
+      ESPOCRM_DATABASE_PASSWORD: databasepassword
+      ESPOCRM_ADMIN_USERNAME: admin
+      ESPOCRM_ADMIN_PASSWORD: admin123
+      ESPOCRM_SITE_URL: "http://localhost:8080"
+
+    volumes:
+      - espocrm-data:/var/www/html/data
+      - espocrm-custom:/var/www/html/custom
+      - espocrm-custom-client:/var/www/html/client/custom
+
+    restart: unless-stopped
+
+    depends_on:
+      espocrm-db:
+        condition: service_healthy
+
+    ports:
+      - "8080:80"
+
+
+  espocrm-daemon:
+    image: espocrm/espocrm:10.0.9
+    container_name: espocrm-daemon
+
+    volumes_from:
+      - espocrm
+
+    restart: unless-stopped
+
+    entrypoint: docker-daemon.sh
+
+    depends_on:
+      espocrm:
+        condition: service_started
+
+
+volumes:
+  espocrm-db:
+  espocrm-data:
+  espocrm-custom:
+  espocrm-custom-client:
