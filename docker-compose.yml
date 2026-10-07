@@ -24,7 +24,7 @@ services:
 
 
   espocrm:
-    image: espocrm/espocrm:latest
+    image: espocrm/espocrm:10.0.9
     container_name: espocrm
 
     environment:
@@ -60,7 +60,7 @@ services:
 
 
   espocrm-daemon:
-    image: espocrm/espocrm:latest
+    image: espocrm/espocrm:10.0.9
     container_name: espocrm-daemon
 
     volumes:
